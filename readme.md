@@ -1,15 +1,5 @@
 # WordPress Docker Orchestration with MySQL & Redis
 
-Proyek ini adalah implementasi multi-container orchestration menggunakan Docker Compose untuk menjalankan WordPress dengan MySQL sebagai database dan Redis sebagai object cache.
-
-## Langkah Menjalankan Stack
-
-1. Clone repository ini.
-2. Buka terminal di direktori proyek.
-3. Jalankan perintah: `docker-compose up -d`
-4. Akses instalasi WordPress di browser melalui: `http://localhost:8000`
-5. Untuk mengaktifkan Redis: Login ke WP Admin, install plugin "Redis Object Cache", dan klik "Enable Object Cache".
-
 ## Dokumentasi (Screenshots)
 
 ### 1. Halaman Instalasi WordPress
@@ -38,4 +28,33 @@ Uji koneksi ke Redis container menggunakan `redis-cli ping` yang menghasilkan ba
 
 ## Q&A
 
-_(Masukkan jawaban dari bagian 2 di sini)_
+## 1. Kenapa perlu volume untuk MySQL?
+
+Agar data database tetap **persisten** dan tidak hilang saat container dihapus atau restart.
+
+---
+
+## 2. Apa fungsi `depends_on`?
+
+Mengatur **urutan startup container**, tapi **tidak menjamin service sudah siap digunakan**.
+
+---
+
+## 3. Bagaimana WordPress connect ke MySQL?
+
+Menggunakan **Docker Internal DNS** dengan nama service sebagai hostname:
+
+```env
+WORDPRESS_DB_HOST=mysql:3306
+```
+
+---
+
+## 4. Apa keuntungan pakai Redis?
+
+Sebagai **object cache di RAM** untuk:
+
+- Mengurangi query ke MySQL
+- Mempercepat loading WordPress
+
+---
