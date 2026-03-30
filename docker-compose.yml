@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wp_database
+      WORDPRESS_DB_USER: steve # <-- Diperbaiki agar sama dengan MYSQL_USER
+      WORDPRESS_DB_PASSWORD: 12345678 # <-- Ganti password WP di sini
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', 'redis');
+        define('WP_REDIS_PORT', 6379);
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - wp_data:/var/www/html
+    networks:
+      - wp_network
+
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678 # <-- Ganti password Root di sini
+      MYSQL_DATABASE: wp_database
+      MYSQL_USER: steve
+      MYSQL_PASSWORD: 12345678 # <-- Harus SAMA persis dengan WORDPRESS_DB_PASSWORD
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - wp_network
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    networks:
+      - wp_network
+
+volumes:
+  wp_data:
+  db_data:
+
+networks:
+  wp_network:
+    driver: bridge
